@@ -18,3 +18,12 @@ app.use(urlencoded({
 
 8. static ==> fevicon/images and all
 9. this.data me kya hots hai broo
+
+10. Will use bcrypt ==> a library which helps to hash the password,
+
+11. jsonwebtoken ==> creates token
+
+12. jwt is a bearer token ==> means jo usko bear krta hai use sahi maan lete hai humm
+    jsike pass hai wohi uska malik hai
+
+13. Rfersh token me dta kmm hota hai,access token and refresh token dono jwt token hi hai    
