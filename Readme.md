@@ -27,3 +27,11 @@ app.use(urlencoded({
     jsike pass hai wohi uska malik hai
 
 13. Rfersh token me dta kmm hota hai,access token and refresh token dono jwt token hi hai    
+
+
+14. Cloudinary ==> videos,pdf file,images all are put here,many big companies use this
+                   Behind the scnes it all uses AWS ==> Wrapper over it 
+                   2 packages used ==> (multer/express-file upload)(one only)(multer use widely)
+                   multer take file and put it into temp place 
+                   then cloudinary takes from temp and put on cloud
+                   
