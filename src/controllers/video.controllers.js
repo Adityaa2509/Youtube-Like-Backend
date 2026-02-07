@@ -3,6 +3,7 @@ import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import mongoose from "mongoose";
 
 const uploadVideo = asyncHandler(async(req,resp)=>{
     const userId = req?.user._id;
@@ -54,12 +55,64 @@ const uploadVideo = asyncHandler(async(req,resp)=>{
     if(!video){
         throw new apiError(500,"Something went wrong while uploading the Video");
     }
-    console.log(thumbnail.secure_url)
-    console.log(video.thumbnail)
     return resp.status(200).json(
         new apiResponse(200,video,"Video Created Successfully")
     );
 
 })
 
-export {uploadVideo}
+const getAllVideos = asyncHandler(async(req,resp)=>{
+    try {
+        const userId = req?.user._id;   
+        if(!userId){
+            throw new apiError(400,"Unauthorized access inside Controller");
+        }
+    
+        const videos = await Video.find({isPublished:true});
+    
+        if(!videos){
+            throw new apiError(400,"No Video Found");
+        }
+    
+        return resp.status(200).json(
+            new apiResponse(200,videos,"All videos fetched successfully")
+        );
+    
+    } catch (error) {
+        console.log(error);
+        throw new apiError(500,error.message || "Something wen twrong while fetching all videos");
+    }
+})
+
+const getVideo = asyncHandler(async(req,resp)=>{
+    try {
+        const userId = req?.user._id;
+        if(!userId){
+            throw new apiError(400,"Unauthorized acces inside controller");
+        }
+        const videoId = req.params?.id;
+        if(!videoId){
+            throw new apiError(400,"Video Id is required");
+        }
+        if(!mongoose.isValidObjectId(videoId)){
+            throw new apiError(401,"Invalid Video Id");
+        }
+
+        const video = await Video.findOne({_id:videoId,isPublished:true});
+    
+        if(!video){
+            throw new apiError(404,"Video Not Found");
+        }
+    
+        return resp.status(200).json(
+            new apiResponse(200,video,"Video fetched successfully")
+        );
+    } catch (error) {
+        console.log(error);
+        throw new apiError(500,error.message||"Something went wrong while fetching a video");
+    }
+
+
+})
+
+export {uploadVideo,getAllVideos,getVideo}
