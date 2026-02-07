@@ -93,8 +93,8 @@ const registerUser =  asyncHandler(async(req,resp)=>{
         fullName,
         email,
         username:username.toLowerCase(),
-        avatar,
-        coverImage,
+        avatar:avatar?.url,
+        coverImage:coverImage?.url || "",
         password
     })
     console.log("user1: ",user);
@@ -287,6 +287,14 @@ const updateUserProfile = asyncHandler(async(req,resp)=>{
         throw new apiError(400,"Username is required");
     }
 
+    const findUsername = await User.find({username});
+    
+    if((findUsername.length>0)&&(findUsername[0]._id !== userId)){
+        console.log(findUsername[0]._id);
+        console.log(userId);
+        throw new apiError(400,"Username already used");
+    }
+
     const user = await User.findByIdAndUpdate(userId,{
         $set:{
             fullName,
@@ -327,7 +335,7 @@ const updateUserAvatar = asyncHandler(async(req,resp)=>{
 
     const user = await User.findByIdAndUpdate(userId,{
         $set:{
-            avatar
+            avatar:avatar.url
         }
     },
         {
@@ -362,7 +370,7 @@ const updateUserCoverImage = asyncHandler(async(req,resp)=>{
     }
     const user = await User.findByIdAndUpdate(userId,{
         $set:{
-            coverImage
+            coverImage:coverImage?.url || ""
         }
     },{
         new:true
