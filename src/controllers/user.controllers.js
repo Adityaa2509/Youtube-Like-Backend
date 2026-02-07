@@ -30,8 +30,6 @@ const generateAccessAndRefreshToken = async(userId)=>{
 }
 
 
-
-
 const registerUser =  asyncHandler(async(req,resp)=>{
 
     //fetch data from client 
@@ -118,6 +116,7 @@ const registerUser =  asyncHandler(async(req,resp)=>{
 
 })
 
+
 const loginUser =  asyncHandler(async(req,resp)=>{
     //fetch data from client--> username/email and password
     if(!req.body){
@@ -171,6 +170,7 @@ const loginUser =  asyncHandler(async(req,resp)=>{
                 ))
 
 })
+
 
 const logoutUser = asyncHandler(async(req,resp)=>{
  
@@ -238,4 +238,22 @@ const refreshAccessToken = asyncHandler(async(req,resp)=>{
 
 })
 
-export {registerUser,loginUser,logoutUser,refreshAccessToken}
+
+const updateUserPassword = asyncHandler(async(req,resp)=>{
+
+})
+
+const updateUserProfile = asyncHandler(async(req,resp)=>{
+    
+})
+
+const updateUserAvatar = asyncHandler(async(req,resp)=>{
+
+})
+
+const updateUserCoverImage = asyncHandler(async(req,resp)=>{
+
+})
+
+
+export {registerUser,loginUser,logoutUser,refreshAccessToken,updateUserPassword,updateUserProfile}
