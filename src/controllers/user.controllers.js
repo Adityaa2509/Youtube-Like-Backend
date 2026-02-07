@@ -10,13 +10,16 @@ const generateAccessAndRefreshToken = async(userId)=>{
 
         const user = await User.findById(userId);
         
-        const refreshToken = user.generateRefreshToken();
-        const accessToken = user.generateAccessToken();
+        const refreshToken = await user.generateRefreshToken();
+        const accessToken = await user.generateAccessToken();
 
         user.refreshToken = refreshToken;
         
         await user.save({validateBeforeSave: false});
 
+        console.log("genrating the token in Login: ",user);
+        console.log("Access Token in gNERATE fUNCTION, ",accessToken);
+        console.log("Refresh Token in Generate Token: ",refreshToken);
         return {accessToken,refreshToken};
 
     }catch(err){
