@@ -346,7 +346,36 @@ const updateUserAvatar = asyncHandler(async(req,resp)=>{
 
 const updateUserCoverImage = asyncHandler(async(req,resp)=>{
 
-  
+    const userId = req?.user._id;
+    if(!userId){
+        throw new apiError(400,"Unauthorized access from controller");
+    }
+    
+    const coverImageLocalPath = req.file?.path;
+    let coverImage = "";
+    console.log("chala 1");
+    if(coverImageLocalPath){
+        coverImage = await uploadOnCloudinary(coverImageLocalPath); 
+        if(!coverImage){
+            throw new apiError(500,"Something went wrong while uploading Cover Image");
+        }
+    }
+    const user = await User.findByIdAndUpdate(userId,{
+        $set:{
+            coverImage
+        }
+    },{
+        new:true
+    }).select("-password -refreshToken");
+    console.log("chala 2")
+    if(!user){
+        throw new apiError(500,"User not found");
+    }
+
+    return resp.status(200).json(
+        new apiResponse(200,user,"User CoverImage updated successfully")
+    );
+
 })
 
 const getCurrentUser = asyncHandler(async(req,resp)=>{
