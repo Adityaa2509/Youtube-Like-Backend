@@ -20,8 +20,14 @@ router.route("/upload-video").post(verifyJWT,
 router.route("/").get(verifyJWT,getAllVideos);
 router.route("/:id").get(verifyJWT,getVideo);
 
-router.route("/update-videoFile/:id").patch(verifyJWT,updateVideoFile);
-router.route("/update-thumbnail/:id").patch(verifyJWT,updateThumbnail);
+router.route("/update-videoFile/:id").patch(verifyJWT,
+                                            upload.single("videoFile"),
+                                            updateVideoFile);
+
+router.route("/update-thumbnail/:id").patch(verifyJWT,
+                                            upload.single("thumbnail"),
+                                            updateThumbnail);
+                                            
 router.route("/update-videoInfo/:id").patch(verifyJWT,updateVideoInfo);
 router.route("/togglePublish/:id").patch(verifyJWT,togglePublishStatus);
 
