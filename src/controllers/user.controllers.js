@@ -271,7 +271,42 @@ const updateUserPassword = asyncHandler(async(req,resp)=>{
 })
 
 const updateUserProfile = asyncHandler(async(req,resp)=>{
-    const userId = req.user._id;
+    const userId = req?.user._id;
+
+    if(!userId){
+        throw new apiError(401,"Unauthorizd Access from Controller"); 
+    }
+
+    const {fullName,username} = req.body;
+
+    if(!fullName || fullName.trim() === ""){
+        throw new apiError(400,"Full Name is required");
+    }
+
+    if(!username || username.trim() === ""){
+        throw new apiError(400,"Username is required");
+    }
+
+    const user = await User.findByIdAndUpdate(userId,{
+        $set:{
+            fullName,
+            username: username.toLowerCase()
+        }
+    },{
+        new: true
+    }).select("-password -refreshToken");
+
+    if(!user){
+        throw new apiError(500,"Error while updating user profile,Please try again later");
+    }
+
+    return resp.status(200).json(
+        new apiResponse(200,
+            user,
+            "User profile updated successfully"
+        )
+    )
+
 })
 
 const updateUserAvatar = asyncHandler(async(req,resp)=>{
