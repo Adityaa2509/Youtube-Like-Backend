@@ -62,7 +62,7 @@ const uploadVideo = asyncHandler(async(req,resp)=>{
 })
 
 const getAllVideos = asyncHandler(async(req,resp)=>{
-    try {
+    
         const userId = req?.user._id;   
         if(!userId){
             throw new apiError(400,"Unauthorized access inside Controller");
@@ -78,14 +78,11 @@ const getAllVideos = asyncHandler(async(req,resp)=>{
             new apiResponse(200,videos,"All videos fetched successfully")
         );
     
-    } catch (error) {
-        console.log(error);
-        throw new apiError(500,error.message || "Something wen twrong while fetching all videos");
-    }
+   
 })
 
 const getVideo = asyncHandler(async(req,resp)=>{
-    try {
+   
         const userId = req?.user._id;
         if(!userId){
             throw new apiError(400,"Unauthorized acces inside controller");
@@ -107,12 +104,75 @@ const getVideo = asyncHandler(async(req,resp)=>{
         return resp.status(200).json(
             new apiResponse(200,video,"Video fetched successfully")
         );
-    } catch (error) {
-        console.log(error);
-        throw new apiError(500,error.message||"Something went wrong while fetching a video");
-    }
+   
 
 
 })
 
-export {uploadVideo,getAllVideos,getVideo}
+const updateVideoFile = asyncHandler(async(req,resp)=>{
+
+})
+
+const updateThumbnail = asyncHandler(async(req,resp)=>{
+
+})
+
+const updateVideoInfo = asyncHandler(async(req,resp)=>{
+
+})
+
+const togglePublishStatus = asyncHandler(async(req,resp)=>{
+
+    
+        const userId = req?.user._id;
+        if(!userId){
+            throw new apiError(400,"Unauthorized access in controller");
+        }
+    
+        const videoId = req.params?.id;
+    
+        if(!videoId){
+            throw new apiError(401,"Video Id is required");
+        }
+        if(!mongoose.isValidObjectId(videoId)){
+            throw new apiError(401,"Video Id is Invalid");
+        }
+    
+        const video = await Video.findOne({_id:videoId});
+        if(!video){
+            throw new apiError(404,"Video not found");
+        }
+        console.log(userId);
+        console.log(video.owner);
+        console.log(userId.toString() === video.owner.toString())
+        if(userId.toString() !== video.owner.toString()){
+            throw new apiError(401,"You are not valid to update Video");
+        }
+       // const isPub = 
+        const updatedVideo = await Video.findByIdAndUpdate(videoId,{
+            $set:{
+                isPublished:!video.isPublished
+            }
+        },{
+            new:true
+        })
+    
+        if(!updatedVideo){
+            throw new apiError(404,"Video not found");
+        }
+    
+        return resp.status(200).json(
+            new apiResponse(200,updatedVideo,"Video is Published Status Toggles Successfully")
+        )
+   
+
+})
+
+const deleteVideo = asyncHandler(async(req,resp)=>{
+
+})
+
+
+
+
+export {uploadVideo,getAllVideos,getVideo,updateVideoFile,updateThumbnail,updateVideoInfo,togglePublishStatus,deleteVideo}
