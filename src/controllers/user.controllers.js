@@ -387,4 +387,19 @@ const getCurrentUser = asyncHandler(async(req,resp)=>{
 
 })
 
-export {registerUser,loginUser,logoutUser,refreshAccessToken,updateUserPassword,updateUserProfile,updateUserAvatar,updateUserCoverImage,getCurrentUser}
+const deleteUser = asyncHandler(async(req,resp)=>{
+    const userId = req?.user._id;
+    if(!userId){
+        throw new apiError(400,"Unauthorized access from controller");
+    }
+
+    const deletedUser = await User.findByIdAndDelete(userId);
+    console.log(deletedUser);
+
+    return resp.status(200).json(
+        new apiResponse(200,{},"User deleted Successfully")
+    )
+
+})
+
+export {registerUser,loginUser,logoutUser,refreshAccessToken,updateUserPassword,updateUserProfile,updateUserAvatar,updateUserCoverImage,getCurrentUser,deleteUser}
