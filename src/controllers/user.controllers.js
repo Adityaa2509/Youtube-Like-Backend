@@ -271,7 +271,7 @@ const updateUserPassword = asyncHandler(async(req,resp)=>{
 })
 
 const updateUserProfile = asyncHandler(async(req,resp)=>{
-    
+    const userId = req.user._id;
 })
 
 const updateUserAvatar = asyncHandler(async(req,resp)=>{
@@ -282,5 +282,13 @@ const updateUserCoverImage = asyncHandler(async(req,resp)=>{
 
 })
 
+const getCurrentUser = asyncHandler(async(req,resp)=>{
+    
+    const user = req.user;
+    return resp.status(200).json(
+        new apiResponse(200,user,"Current User Fetched successfully")
+    );
 
-export {registerUser,loginUser,logoutUser,refreshAccessToken,updateUserPassword,updateUserProfile,updateUserAvatar,updateUserCoverImage}
+})
+
+export {registerUser,loginUser,logoutUser,refreshAccessToken,updateUserPassword,updateUserProfile,updateUserAvatar,updateUserCoverImage,getCurrentUser}
