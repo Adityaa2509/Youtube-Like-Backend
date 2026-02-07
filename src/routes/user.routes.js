@@ -24,8 +24,8 @@ router.route("/refreshToken").post(refreshAccessToken)
 
 router.route("/update-password").patch(verifyJWT,updateUserPassword)
 
-router.route("/update-avatar").patch(upload.single("avatar"),
-                                    verifyJWT,
+router.route("/update-avatar").patch( verifyJWT,
+                                    upload.single("avatar"),
                                     updateUserAvatar)
 
 router.route("/update-coverImage").patch(verifyJWT,
