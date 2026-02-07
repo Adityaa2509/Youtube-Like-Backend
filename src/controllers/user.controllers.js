@@ -241,7 +241,33 @@ const refreshAccessToken = asyncHandler(async(req,resp)=>{
 
 
 const updateUserPassword = asyncHandler(async(req,resp)=>{
+    const userId = req.user._id;
+    console.log(req.body)
+    const {oldPassword,newPassword} = req.body;
 
+    if(!oldPassword || oldPassword.trim() === ""){
+        throw new apiError(400,"Old Password is required");
+    }
+
+    if(!newPassword || newPassword.trim() === ""){
+        throw new apiError(400,"New Password is required");
+    }
+
+    const user = await User.findById(userId);
+
+    const isOldPasswordMatch = await user.isPasswordMatch(oldPassword);
+
+    if(!isOldPasswordMatch){
+        throw new apiError(401,"Old Password is incorrect");
+    }
+    
+    user.password = newPassword;
+
+    await user.save({validateBeforeSave: false});
+
+    return resp.status(200).json(
+        new apiResponse(200,{},"Password updated successfully")
+    );
 })
 
 const updateUserProfile = asyncHandler(async(req,resp)=>{
