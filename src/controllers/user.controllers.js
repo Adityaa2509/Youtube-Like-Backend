@@ -345,8 +345,8 @@ const updateUserAvatar = asyncHandler(async(req,resp)=>{
 })
 
 const updateUserCoverImage = asyncHandler(async(req,resp)=>{
-    
 
+  
 })
 
 const getCurrentUser = asyncHandler(async(req,resp)=>{
