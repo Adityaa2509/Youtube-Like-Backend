@@ -91,16 +91,51 @@ const postComment = asyncHandler(async(req,resp)=>{
 
 })
 
-const getCommentsOfUserOnVideo = asyncHandler(async(req,resp)=>{
-
-})
-
-const getCommentOfUser = asyncHandler(async(req,resp)=>{
-
-})
 
 const updateComment = asyncHandler(async(req,resp)=>{
    
+    const userId = req?.user._id;
+    if(!userId){
+        throw new apiError(400,"Unauthorized Access");
+    }
+
+    const commentId = req.params?.commentId;
+    if(!commentId){
+         throw new apiError(402,"CommentId is required");
+    }
+    if(!mongoose.isValidObjectId(commentId)){
+        throw new apiError(402,"Invalid Comment Id");
+    }
+
+    const {content} = req.body;
+    if(!content || content.trim() === ""){
+        throw new apiError(402,"Content is required to update the Comment");
+    }
+
+    const comment = await Comment.findOne({_id:commentId});
+    if(!comment){
+        throw new apiError(404,"Comment Not Found");
+    }
+
+    if(userId.toString() !== comment.owner.toString()){
+        throw new apiError(400,"User is Invalid to update comment");
+    }
+
+    const updatedComment = await Comment.findByIdAndUpdate(commentId,{
+        $set:{
+            content
+        }
+    },{new: true});
+    
+    if(!updatedComment){
+        throw new apiError(500,"Something went wrong while updating Comment");
+    }
+
+    return resp.status(200).json(
+        new apiResponse(200,updatedComment,"Comment Updated Successfully")
+    );
+
+
 })
 
 const updateLikeOnComment = asyncHandler(async(req,resp)=>{
@@ -110,5 +145,14 @@ const updateLikeOnComment = asyncHandler(async(req,resp)=>{
 const deleteComment = asyncHandler(async(req,resp)=>{
 
 })
+
+const getCommentsOfUserOnVideo = asyncHandler(async(req,resp)=>{
+
+})
+
+const getCommentOfUser = asyncHandler(async(req,resp)=>{
+
+})
+
 
 export {getComment,getComments,postComment,updateComment,updateLikeOnComment,deleteComment,getCommentOfUser,getCommentsOfUserOnVideo};
