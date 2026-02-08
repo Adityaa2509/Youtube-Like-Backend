@@ -14,3 +14,4 @@ router.route("/update-comment/:videoId/:commentId").patch(verifyJWT,updateCommen
 router.route("/update-like/:videoId/:commentId").patch(verifyJWT,updateLikeOnComment);
 router.route("/delete-comment/:commentId").delete(verifyJWT,deleteComment);
 
+export default router;
