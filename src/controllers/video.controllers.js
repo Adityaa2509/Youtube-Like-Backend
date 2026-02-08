@@ -138,8 +138,9 @@ const updateVideoFile = asyncHandler(async(req,resp)=>{
         if(!video){
             throw new apiError(404,"Video not found");
         }
-        
-        if(userId.toString() !== video.owner.toString()){
+        const user = await User.findById(userId).select("-password -refreshToken");
+        if(user.isAdmin){}
+        else if((userId.toString() !== video.owner.toString())){
             throw new apiError(401,"You are not valid to update Video");
         }
 
@@ -160,9 +161,16 @@ const updateVideoFile = asyncHandler(async(req,resp)=>{
         if(!updatedVideo){
             throw new apiError("Something went wrong while updating  videoFile");
         }
+        let msg = "";
+        if(user.isAdmin && (userId.toString() !== video.owner.toString())){
+            msg = "Video File Updated Successfully";
+        }
+        else{
+            msg = "Video file updated successfully by Owner";
+        }
 
         return resp.status(200).json(
-            new apiResponse(200,updatedVideo,"videoFile updated Successfully")
+            new apiResponse(200,updatedVideo,msg)
         );
 })
 
@@ -191,8 +199,10 @@ const updateThumbnail = asyncHandler(async(req,resp)=>{
         if(!video){
             throw new apiError(404,"Video not found");
         }
-        
-        if(userId.toString() !== video.owner.toString()){
+
+         const user = await User.findById(userId).select("-password -refreshToken");
+        if(user.isAdmin){}
+        else if(userId.toString() !== video.owner.toString()){
             throw new apiError(401,"You are not valid to update Video");
         }
 
@@ -213,9 +223,17 @@ const updateThumbnail = asyncHandler(async(req,resp)=>{
         if(!updatedVideo){
             throw new apiError("Something went wrong while updating Video Thumbnail");
         }
+          let msg = "";
+        if(user.isAdmin && (userId.toString() !== video.owner.toString())){
+            msg = "Video Thumbnail Updated Successfully By Admin";
+        }
+        else{
+            msg = "Video Thumbnail updated successfully by Owner";
+        }
+
 
         return resp.status(200).json(
-            new apiResponse(200,updatedVideo,"Thumbnail updated Successfully")
+            new apiResponse(200,updatedVideo,msg)
         );
 })
 
@@ -249,8 +267,9 @@ const updateVideoInfo = asyncHandler(async(req,resp)=>{
         if(!video){
             throw new apiError(404,"Video not found");
         }
-        
-        if(userId.toString() !== video.owner.toString()){
+         const user = await User.findById(userId).select("-password -refreshToken");
+        if(user.isAdmin){}
+        else if(userId.toString() !== video.owner.toString()){
             throw new apiError(401,"You are not valid to update Video");
         }
 
@@ -267,8 +286,16 @@ const updateVideoInfo = asyncHandler(async(req,resp)=>{
             throw new apiError(500,"Something went wrong while updating video");
         }
 
+         let msg = "";
+        if(user.isAdmin && (userId.toString() !== video.owner.toString())){
+            msg = "Video Info Updated Successfully By Admin";
+        }
+        else{
+            msg = "Video Info updated successfully by Owner";
+        }
+
         return resp.status(200).json(
-            new apiResponse(200,updatedVideo,"Video updated successfully")
+            new apiResponse(200,updatedVideo,msg)
         );
 
 })
@@ -297,7 +324,9 @@ const togglePublishStatus = asyncHandler(async(req,resp)=>{
         console.log(userId);
         console.log(video.owner);
         console.log(userId.toString() === video.owner.toString())
-        if(userId.toString() !== video.owner.toString()){
+         const user = await User.findById(userId).select("-password -refreshToken");
+        if(user.isAdmin){}
+        else if(userId.toString() !== video.owner.toString()){
             throw new apiError(401,"You are not valid to update Video");
         }
        
@@ -313,8 +342,16 @@ const togglePublishStatus = asyncHandler(async(req,resp)=>{
             throw new apiError(404,"Video not found");
         }
     
+         let msg = "";
+        if(user.isAdmin && (userId.toString() !== video.owner.toString())){
+            msg = "Video Publish Status Toggled Successfully By Admin";
+        }
+        else{
+            msg = "Video Publish Status Toggled successfully by Owner";
+        }
+
         return resp.status(200).json(
-            new apiResponse(200,updatedVideo,"Video is Published Status Toggles Successfully")
+            new apiResponse(200,updatedVideo,msg)
         )
    
 
@@ -342,7 +379,9 @@ const deleteVideo = asyncHandler(async(req,resp)=>{
         console.log(userId);
         console.log(video.owner);
         console.log(userId.toString() === video.owner.toString())
-        if(userId.toString() !== video.owner.toString()){
+         const user = await User.findById(userId).select("-password -refreshToken");
+        if(user.isAdmin){}
+        else if(userId.toString() !== video.owner.toString()){
             throw new apiError(401,"You are not valid to update Video");
         }
       const deletedVideo = await Video.findByIdAndDelete(videoId);
@@ -350,9 +389,16 @@ const deleteVideo = asyncHandler(async(req,resp)=>{
       if(!deletedVideo){
         throw new apiError(500,"Something went wrong while Deleting Video");
       }
+       let msg = "";
+        if(user.isAdmin && (userId.toString() !== video.owner.toString())){
+            msg = "Video Deleted Successfully By Admin";
+        }
+        else{
+            msg = "Video Deleted successfully by Owner";
+        }
 
       return resp.status(200).json(
-        new apiResponse(200,deletedVideo,"Video Deleted Successfully")
+        new apiResponse(200,deletedVideo,msg)
       );
 })
 

@@ -46,7 +46,11 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Video"
         }
-    ]
+    ],
+    isAdmin:{
+        type:Boolean,
+        default:false
+    }
 
 },{timestamps: true});
 
