@@ -144,6 +144,49 @@ const updateLikeOnComment = asyncHandler(async(req,resp)=>{
 
 const deleteComment = asyncHandler(async(req,resp)=>{
 
+    const userId = req?.user._id;
+    if(!userId){
+        throw new apiError(400,"Unauthorized Access inside Controller");
+    }
+
+    const commentId = req.params?.commentId;
+    if(!commentId){
+        throw new apiError(402,"Comment Id is required");
+    }
+    if(!mongoose.isValidObjectId(commentId)){
+        throw new apiError(402,"Invalid Comment Id");
+    }
+
+    const user = await User.findOne({_id:userId});
+    if(!user){
+        throw new apiError(404,"User not found");
+    }
+
+    const comment = await Comment.findOne({_id:commentId});
+    if(!comment){
+        throw new apiError(404,"Comment Not Found");
+    }
+
+    if(!user.isAdmin && (userId.toString() !== comment.owner.toString())){
+        throw new apiError(401,"User is not valid to delete Comment");
+    }
+
+    const deletedComment = await Comment.findByIdAndDelete(commentId);
+    if(!deletedComment){
+        throw new apiError(500,"Something went wrong while deleting Comment");
+    }
+
+    let respMsg = "Comment deleted successfully by Owner"
+    if(user.isAdmin && (userId.toString() !== comment.owner.toString())){
+        respMsg = "Comment deleted successfully By Admin"
+    }
+
+    return resp.status(200).json(
+        new apiResponse(200,{},respMsg)
+    );
+
+
+
 })
 
 const getCommentsOfUserOnVideo = asyncHandler(async(req,resp)=>{
