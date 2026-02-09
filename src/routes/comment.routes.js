@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteComment, getComment, getComments, getCommentsOfUserOnVideo, postComment, updateComment, updateLikeOnComment } from "../controllers/comment.controllers.js";
+import { deleteComment, getComment, getCommentOfUser, getComments, getCommentsOfUserOnVideo, postComment, updateComment, updateLikeOnComment } from "../controllers/comment.controllers.js";
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
 
 const router = Router();
@@ -16,7 +16,7 @@ router.route("/delete-comment/:commentId").delete(verifyJWT,deleteComment);
 
 //additional feature logic
 router.route("/getCommentsUserVideo/:videoId/:userId").get(verifyJWT,getCommentsOfUserOnVideo);
-router.route("/getCommentsUser/:videoId/:userId").get(verifyJWT,getCommentsOfUserOnVideo);
+router.route("/getCommentsUser/:userId").get(verifyJWT,getCommentOfUser);
 
 
 export default router;

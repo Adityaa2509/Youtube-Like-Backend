@@ -190,10 +190,97 @@ const deleteComment = asyncHandler(async(req,resp)=>{
 })
 
 const getCommentsOfUserOnVideo = asyncHandler(async(req,resp)=>{
+    const videoId = req.params?.videoId;
+    if(!videoId){
+        throw new apiError(402,"VideoId is required");
+    }
+    if(!mongoose.isValidObjectId(videoId)){
+        throw new apiError(401,"VideoId is invalid");
+    }
+
+    const userId = req.params?.userId;
+    if(!userId){
+        throw new apiError(402,"UserId is required");
+    }
+    if(!mongoose.isValidObjectId(userId)){
+        throw new apiError(401,"UserId is not valid");
+    }
+
+    const video = await Video.findOne({_id:videoId});
+    if(!video){
+        throw new apiError(400,"Video not found");
+    }
+
+    const user = await User.findOne({_id:userId});
+    if(!user){
+        throw new apiError(400,"User not found");
+    }
+
+    const comments = await Comment.find({
+        $and:[{
+            video:videoId,
+            owner:userId
+        }]
+    })
+
+    if(!comments){
+        throw new apiError(500,"Something went wrong while fetching Comments");
+    }
+
+    return resp.status(200).json(
+        new apiResponse(200,{
+            data:comments,
+            numberOfCommentsOnVideo:comments.length
+        },"Comments fetched successully")
+    );
 
 })
 
 const getCommentOfUser = asyncHandler(async(req,resp)=>{
+    const userId = req?.user._id;
+    if(!userId){
+        throw new apiError(400,"Login is required");
+    }
+
+    const loggedInUser = await User.findOne({_id:userId});
+
+    if(!loggedInUser){
+        throw new apiError(402,"Admin not found");
+    }
+
+    if(!loggedInUser.isAdmin){
+        throw new apiError(402,"User not Valid to access API");
+    }
+
+    const reqUserId = req.params?.userId;
+    if(!reqUserId){
+        throw new apiError(402,"Userid is required");
+    }
+
+    if(!mongoose.isValidObjectId(reqUserId)){
+        throw new apiError(401,"UserId is not valid");
+    }
+
+    const user = await User.findOne({_id:reqUserId});
+    if(!user){
+        throw new apiError(404,"User not found");
+    }
+
+    const comments = await Comment.find({owner:user._id});
+
+    if(!comments){
+        throw new apiError(500,"Something went wrong while fetching Comment");
+    }
+
+    return resp.status(200).json(
+        new apiResponse(200,{
+            data:comments,
+            numberOfComments:comments.length
+        },
+    "Comments fetched Successfully")
+    );
+
+   
 
 })
 
