@@ -190,6 +190,13 @@ const deleteComment = asyncHandler(async(req,resp)=>{
 })
 
 const getCommentsOfUserOnVideo = asyncHandler(async(req,resp)=>{
+
+    const loggedInUser = req?.user;
+
+    if(!loggedInUser){
+        throw new apiError(404,"Login is required");
+    }
+
     const videoId = req.params?.videoId;
     if(!videoId){
         throw new apiError(402,"VideoId is required");
@@ -209,6 +216,11 @@ const getCommentsOfUserOnVideo = asyncHandler(async(req,resp)=>{
     const video = await Video.findOne({_id:videoId});
     if(!video){
         throw new apiError(400,"Video not found");
+    }
+    console.log(loggedInUser._id);
+    console.log(video.owner);
+    if(loggedInUser._id.toString() !== video.owner.toString()){
+        throw new apiError(404,"You are not valid to fetch API");
     }
 
     const user = await User.findOne({_id:userId});
