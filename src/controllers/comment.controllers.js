@@ -178,11 +178,21 @@ const updateLikeOnComment = asyncHandler(async(req,resp)=>{
         comment.likes = comment.likes.filter((user)=>user.toString() !== loggedInUser._id.toString());
     }
     else{
+        const dislikeAlreadyPresent = comment.dislikes.filter((user)=>{
+            return user.toString() == loggedInUser._id.toString();
+        })
+        console.log("dis: ",dislikeAlreadyPresent)
+        if(dislikeAlreadyPresent.length>0){
+            comment.dislikes = comment.dislikes.filter((user)=>user.toString() !== loggedInUser._id.toString());
+        }
         comment.likes.push(loggedInUser._id);
+        console.log("dising: ",comment.dislikes);
     }
 
     comment.numberOfLikes = comment.likes.length;
-   // console.log(comment.likes)
+    comment.numberOfDislikes = comment.dislikes.length;
+     
+    // console.log(comment.likes)
     const updatedComment = await comment.save({new:true});
     
     if(!updatedComment){
@@ -234,9 +244,19 @@ const updateDislikeOnComment = asyncHandler(async(req,resp)=>{
         comment.dislikes = comment.dislikes.filter((user)=>user.toString() !== loggedInUser._id.toString());
     }
     else{
+        const likesAlreadyPresent = comment.likes.filter((user)=>{
+            return user.toString() === loggedInUser._id.toString()
+        });
+        if(likesAlreadyPresent.length>0){
+            comment.likes = comment.likes.filter((user)=>{
+                return user.toString() !== loggedInUser._id.toString()
+            })
+            console.log(comment.dislikes)
+        }
         comment.dislikes.push(loggedInUser._id);
     }
 
+    comment.numberOfLikes = comment.likes.length;
     comment.numberOfDislikes = comment.dislikes.length;
    // console.log(comment.likes)
     const updatedComment = await comment.save({new:true});
