@@ -196,6 +196,61 @@ const updateLikeOnComment = asyncHandler(async(req,resp)=>{
 
 })
 
+const updateDislikeOnComment = asyncHandler(async(req,resp)=>{
+    const loggedInUser = req?.user;
+    if(!loggedInUser){
+        throw new apiError(400,"Unauthorized Access inside Controller");
+    }
+
+    const videoId = req.params?.videoId;
+    if(!videoId){
+        throw new apiError(402,"VideoId is required");
+    }
+    if(!mongoose.isValidObjectId(videoId)){
+        throw new apiError(402,"Invalid VideoId");
+    }
+    const video = await Video.findOne({_id:videoId});
+    if(!video){
+        throw new apiError(404,"Video not Found");
+    }
+    
+    const commentId = req.params?.commentId;
+    if(!commentId){
+        throw new apiError(402,"Comment not found");
+    }
+    if(!mongoose.isValidObjectId(commentId)){
+        throw new apiError(402,"Invalid comment not found");
+    }
+    const comment = await Comment.findOne({_id:commentId});
+    if(!comment){
+        throw new apiError(404,"comment not found");
+    }
+
+    const dislikeAlreadyPresent  = comment.dislikes.filter((user)=>{
+        return user.toString() === loggedInUser._id.toString()
+    });
+    
+    if(dislikeAlreadyPresent.length>0){
+        comment.dislikes = comment.dislikes.filter((user)=>user.toString() !== loggedInUser._id.toString());
+    }
+    else{
+        comment.dislikes.push(loggedInUser._id);
+    }
+
+    comment.numberOfDislikes = comment.dislikes.length;
+   // console.log(comment.likes)
+    const updatedComment = await comment.save({new:true});
+    
+    if(!updatedComment){
+        throw new apiError(500,"Something went wrong while disliking comment");
+    }
+
+
+    return resp.status(200).json(
+        new apiResponse(200,updatedComment,"Dislike comment successfully done")
+    );
+})
+
 const deleteComment = asyncHandler(async(req,resp)=>{
 
     const userId = req?.user._id;
@@ -351,4 +406,4 @@ const getCommentOfUser = asyncHandler(async(req,resp)=>{
 })
 
 
-export {getComment,getComments,postComment,updateComment,updateLikeOnComment,deleteComment,getCommentOfUser,getCommentsOfUserOnVideo};
+export {getComment,getComments,postComment,updateComment,updateLikeOnComment,deleteComment,getCommentOfUser,getCommentsOfUserOnVideo,updateDislikeOnComment};
