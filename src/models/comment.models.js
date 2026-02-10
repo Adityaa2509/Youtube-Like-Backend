@@ -24,6 +24,16 @@ const commentSchema = new mongoose.Schema({
     numberOfLikes:{
         type:Number,
         default:0
+    },
+    dislikes:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ],
+    numberOfDislikes:{
+        type:Number,
+        default:0
     }
 },{timestamps: true});
 
