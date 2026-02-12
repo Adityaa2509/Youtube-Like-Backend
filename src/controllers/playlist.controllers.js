@@ -4,7 +4,7 @@ import { Playlist } from "../models/playlist.models.js"
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createPlaylist = asyncHandler(async(req,resp)=>{
-
+    
 })
 
 const renamePlaylist = asyncHandler(async(req,resp)=>{
