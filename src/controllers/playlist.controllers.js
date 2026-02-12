@@ -12,9 +12,14 @@ const createPlaylist = asyncHandler(async(req,resp)=>{
 
     const {name,description} = req.body;
 
-    if(!name){
+    if(!name || name.trim() === ""){
         throw new apiError(402,"Name is required")
     }
+    if(!description || description.trim() === ""){
+        throw new apiError(402,"Description is required");
+    }
+
+    const playlist = await Playlist.findOne({});
 })
 
 const renamePlaylist = asyncHandler(async(req,resp)=>{
