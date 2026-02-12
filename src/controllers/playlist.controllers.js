@@ -2,9 +2,19 @@ import { User } from "../models/user.models.js";
 import { Video } from "../models/video.models.js";
 import { Playlist } from "../models/playlist.models.js"
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { apiError } from "../utils/apiError.js";
 
 const createPlaylist = asyncHandler(async(req,resp)=>{
-    
+    const user = req?.user;
+    if(!user){
+        throw new apiError(400,"Unauthenticated access in controller");
+    }
+
+    const {name,description} = req.body;
+
+    if(!name){
+        throw new apiError(402,"Name is required")
+    }
 })
 
 const renamePlaylist = asyncHandler(async(req,resp)=>{

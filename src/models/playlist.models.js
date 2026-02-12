@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 const playlistSchema = mongoose.Schema({
     name:{
         type:String,
-        required:[true,"Playlist name is required"],
-        unique:[true,"Playlist name must be unique"]
+        required:[true,"Playlist name is required"]
     },
     description:{
         type:String,
