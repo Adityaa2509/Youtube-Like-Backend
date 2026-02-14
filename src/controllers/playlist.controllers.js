@@ -50,23 +50,23 @@ const renamePlaylist = asyncHandler(async(req,resp)=>{
     
     const user = req?.user;
     if(!user){
-        throw new apiError(400,"Unauthorized acces sinside controller");
+        throw new apiError(401,"Unauthorized acces sinside controller");
     }
 
     const playlistId = req.params?.playlistId;
     if(!playlistId){
-        throw new apiError(402,"PlaylistId is required");
+        throw new apiError(400,"PlaylistId is required");
     }
     if(!mongoose.isValidObjectId(playlistId)){
-        throw new apiError(402,"PlaylistId is not valid");
+        throw new apiError(400,"PlaylistId is not valid");
     }
 
     const {name,description} = req.body;
     if(!name || name.trim() === ""){
-        throw new apiError(402,"Name is required");
+        throw new apiError(400,"Name is required");
     }
     if(!description || description.trim() === ""){
-        throw new apiError(402,"Description is required");
+        throw new apiError(400,"Description is required");
     }
     //name handling logic to be handled
 
@@ -75,10 +75,44 @@ const renamePlaylist = asyncHandler(async(req,resp)=>{
         throw new apiError(404,"Playlist not found");
     }
 
-    //update playlist
+    if(playlist.owner.toString() !== user._id.toString()){
+        throw new apiError(401,"User is unauthorized to update this playlist");
+    }
 
+    const sameNamePlaylistWithLoggedInUser = await Playlist.findOne({
+        $and:[{
+            name:name,
+            owner:user._id
+        }]
+    })
+
+
+    if((sameNamePlaylistWithLoggedInUser) 
+    && (sameNamePlaylistWithLoggedInUser._id.toString() === playlistId.toString())
+    && (playlist.name === name) && (playlist.description == description)){
+        throw new apiError(400,"Same values given");
+    }
+
+    if(sameNamePlaylistWithLoggedInUser && 
+        (sameNamePlaylistWithLoggedInUser._id.toString() !== playlistId.toString())
+    ){
+        throw new apiError(400,"You already have Playlist with this Name");
+    }
+
+    //update playlist
+    const updatedPlaylist = await Playlist.findByIdAndUpdate(playlistId,{
+        $set:{
+            name,
+            description
+        }
+    },{new:true});
+    if(!updatedPlaylist){
+        throw new apiError(500,"Something went wrong while udpating Playlist");
+    }
     //return response
-    
+    return resp.status(200).json(
+        new apiResponse(200,updatedPlaylist,"Playlist udpated Successfully")
+    );
     
 })
 
