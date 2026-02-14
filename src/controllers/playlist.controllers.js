@@ -96,8 +96,8 @@ const getUserPlaylists = asyncHandler(async(req,resp)=>{
         throw new apiError(400,"Unauthorized Access inside Controller");
     }
 
-    const playlists = await Playlist.findOne({owner:user._id});
-
+    const playlists = await Playlist.find({owner:user._id});
+    
     if(!playlists){
         throw new apiError(500,"Something went wrong while fetching Playlist");
     }
@@ -164,7 +164,7 @@ const deletePlaylist = asyncHandler(async(req,resp)=>{
         throw new apiError(400,"You are not valid user to delete this Playlist");
     }
 
-    const deletedPlaylist = await Playlist.findByIdAndUpdate(playlistId);
+    const deletedPlaylist = await Playlist.findByIdAndDelete(playlistId);
 
     if(!deletedPlaylist){
         throw new apiError(500,"Something went wrong while deleting Playlist");
@@ -173,7 +173,7 @@ const deletePlaylist = asyncHandler(async(req,resp)=>{
     return resp.status(200).json(
         new apiResponse(200,deletedPlaylist,"Playlist Successfully Deleted")
     );
-    
+
 })
 
 export {createPlaylist,renamePlaylist,addVideoInPlaylist,removeVideoInPlaylist,getPlaylistById,getUserPlaylists,deletePlaylist}
