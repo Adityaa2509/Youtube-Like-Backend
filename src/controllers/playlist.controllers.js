@@ -9,16 +9,16 @@ import mongoose from "mongoose";
 const createPlaylist = asyncHandler(async(req,resp)=>{
     const user = req?.user;
     if(!user){
-        throw new apiError(400,"Unauthenticated access in controller");
+        throw new apiError(401,"Unauthenticated access in controller");
     }
 
     const {name,description} = req.body;
 
     if(!name || name.trim() === ""){
-        throw new apiError(402,"Name is required")
+        throw new apiError(400,"Name is required")
     }
     if(!description || description.trim() === ""){
-        throw new apiError(402,"Description is required");
+        throw new apiError(400,"Description is required");
     }
 
     const playlist = await Playlist.findOne({
@@ -28,7 +28,7 @@ const createPlaylist = asyncHandler(async(req,resp)=>{
         }]
     });
     if(playlist){
-        throw new apiError(403,"You already have playlist with this name");
+        throw new apiError(400,"You already have playlist with this name");
     }
 
     const createdPlaylist = await Playlist.create({
