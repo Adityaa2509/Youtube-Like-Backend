@@ -407,4 +407,12 @@ const deleteUser = asyncHandler(async(req,resp)=>{
 
 })
 
-export {registerUser,loginUser,logoutUser,refreshAccessToken,updateUserPassword,updateUserProfile,updateUserAvatar,updateUserCoverImage,getCurrentUser,deleteUser}
+const updateWatchHistory = asyncHandler(async(req,resp)=>{
+
+})
+
+const clearWatchHistory = asyncHandler(async(req,resp)=>{
+
+})
+
+export {registerUser,loginUser,logoutUser,refreshAccessToken,updateUserPassword,updateUserProfile,updateUserAvatar,updateUserCoverImage,getCurrentUser,deleteUser,updateWatchHistory,clearWatchHistory}
