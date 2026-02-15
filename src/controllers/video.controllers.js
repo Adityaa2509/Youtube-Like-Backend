@@ -99,8 +99,16 @@ const getVideo = asyncHandler(async(req,resp)=>{
             throw new apiError(401,"Invalid Video Id");
         }
 
-        const video = await Video.findOne({_id:videoId,isPublished:true});
-    
+        let video = await Video.findOne({_id:videoId,isPublished:true});
+       
+        if(video.owner.toString() !== userId.toString()){
+            video = await Video.findOneAndUpdate({_id:videoId},{
+                $inc:{
+                    views:1
+                }
+            },{new:true}); 
+        }
+
         if(!video){
             throw new apiError(404,"Video Not Found");
         }
