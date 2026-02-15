@@ -452,7 +452,24 @@ const updateWatchHistory = asyncHandler(async(req,resp)=>{
 })
 
 const clearWatchHistory = asyncHandler(async(req,resp)=>{
+    const user = req?.user;
+    if(!user){
+        throw new apiError(400,"Unauthorized");
+    }
 
+    const updatedUser = await User.findByIdAndUpdate(user._id,{
+        $set:{
+            watchHistory:[]
+        }        
+    },{new:true});
+
+    if(!updatedUser){
+        throw new apiError(500,"Something went wrong while updating User");
+    }
+
+    return resp.status(200).json(
+        new apiResponse(200,updatedUser,"Watch History Cleared successfully")
+    );
 })
 
 export {registerUser,loginUser,logoutUser,refreshAccessToken,updateUserPassword,updateUserProfile,updateUserAvatar,updateUserCoverImage,getCurrentUser,deleteUser,updateWatchHistory,clearWatchHistory}
