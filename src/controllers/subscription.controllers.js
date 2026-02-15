@@ -68,7 +68,45 @@ const toogleSubscription = asyncHandler(async(req,resp)=>{
 })
 
 const getChannelSubscribers = asyncHandler(async(req,resp)=>{
+    const user = req?.user;
 
+    if(!user){
+        throw new apiError(401,"Unauthorized");
+    }
+    if((!user.isAdmin) && (req.query?.channelId) && (user._id.toString() !== req.query?.channelId.toString())){
+        throw new apiError(401,"Not valid user to fetch info about Channel");
+    }
+    let channelId = "";
+    if(user.isAdmin){
+        channelId = req.query?.channelId || user._id;
+    }else{
+        channelId = user._id;
+    }
+    if(!channelId || channelId.toString().trim() === ""){
+        throw new apiError(400,"Channel Id is required");
+    }
+    if(!mongoose.isValidObjectId(channelId)){
+        throw new apiError(400,"Channel Id is Invalid");
+    }
+    const channel = await User.findById(channelId);
+    if(!channel){
+        throw new apiError(404,"Channel not found");
+    }
+
+    const subscribers = await Subscription.find({channel:channelId}).populate({
+        path:"subscriber",
+        select:"username email fullName avatar"
+});
+
+    if(!subscribers){
+        throw new apiError(500,"Something went wrong while fetching subscribers");
+    }
+
+    return resp.status(200).json(
+        new apiResponse(200,{
+            data:subscribers,
+            numberofSubscriber:subscribers.length
+        },"Subscribers fetched successfully"));
 })
 
 const getSubscribedChannel = asyncHandler(async(req,resp)=>{

@@ -5,7 +5,7 @@ import { getChannelSubscribers, getSubscribedChannel, toogleSubscription } from 
 const router = Router();
 
 router.route("/toggle/:channelId").post(verifyJWT,toogleSubscription);
-router.route("/getSubscribers/:channelId").get(verifyJWT,getChannelSubscribers);
+router.route("/getSubscribers").get(verifyJWT,getChannelSubscribers);
 router.route("/getSubscribedChannel/:subscriberId").get(verifyJWT,getSubscribedChannel)
 
 export default router;
