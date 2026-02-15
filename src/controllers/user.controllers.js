@@ -5,6 +5,7 @@ import {User} from "../models/user.models.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { apiResponse } from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 
 const generateAccessAndRefreshToken = async(userId)=>{
@@ -28,7 +29,6 @@ const generateAccessAndRefreshToken = async(userId)=>{
         throw new apiError(500,"Error while generating access token and refresh token.");
     }
 }
-
 
 const registerUser =  asyncHandler(async(req,resp)=>{
 
@@ -116,7 +116,6 @@ const registerUser =  asyncHandler(async(req,resp)=>{
 
 
 })
-
 
 const loginUser =  asyncHandler(async(req,resp)=>{
     //fetch data from client--> username/email and password
@@ -408,6 +407,47 @@ const deleteUser = asyncHandler(async(req,resp)=>{
 })
 
 const updateWatchHistory = asyncHandler(async(req,resp)=>{
+    const user = req?.user;
+    if(!user){
+        throw new apiError(400,"Unauthorized");
+    }
+
+    const {videoId} = req.params;
+    if(!videoId || videoId.toString().trim() === ""){
+        throw new apiError(400,"Video Id is required");
+    }
+    if(!mongoose.isValidObjectId(videoId)){
+        throw new apiError(400,"Video Id is invalid");
+    }
+
+    const updatedWatchHistory = await User.findOneAndUpdate(
+        {_id:user._id,"watchHistory.video":videoId},{
+            $set:{
+                "watchHistory.$.watchedAt":new Date()
+            }
+        },{new:true});
+
+        if(updatedWatchHistory){
+            return resp.status(200).json(
+                new apiResponse(200,updatedWatchHistory,"WatchHistory Successfully updated")
+            );
+        }
+
+        const createWatchHistory = await User.findByIdAndUpdate(user._id,{
+            $push:{
+                watchHistory:{
+                    video:videoId,
+                }
+            }
+        },{new:true})
+
+        if(!createWatchHistory){
+            throw new apiError(500,"Something went wrong while updating watch history");
+        }
+
+        return resp.status(200).json(
+            new apiResponse(200,createWatchHistory,"WatchHistory Successfully updated")
+        );
 
 })
 
