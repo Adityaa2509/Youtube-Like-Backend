@@ -110,7 +110,46 @@ const getChannelSubscribers = asyncHandler(async(req,resp)=>{
 })
 
 const getSubscribedChannel = asyncHandler(async(req,resp)=>{
-    
+    const user = req?.user;
+    if(!user){
+        throw new apiError(401,"Unauthorized Access");
+    }
+    if((!user.isAdmin) && (req.query?.subscriberId) && (user._id.toString() !== req.query?.subscriberId.toString())){
+        throw new apiError(401,"Not valid user to fetch info about Subscriber");
+    }
+    let subscriberId = "";
+    if(user.isAdmin){
+        subscriberId = req.query?.subscriberId || user._id;
+    }else{
+        subscriberId = user._id;
+    }
+    if(!subscriberId || subscriberId.toString().trim() === ""){
+        throw new apiError(400,"subscriber Id is required");
+    }
+    if(!mongoose.isValidObjectId(subscriberId)){
+        throw new apiError(400,"subscriber Id is Invalid");
+    }
+
+     const subscriber = await User.findById(subscriberId);
+    if(!subscriber){
+        throw new apiError(404,"Subscriber not found");
+    }
+
+    const channels = await Subscription.find({subscriber:subscriberId}).populate({
+        path:"channel",
+        select:"username email fullName avatar"
+});
+
+    if(!channels){
+        throw new apiError(500,"Something went wrong while fetching channel");
+    }
+
+    return resp.status(200).json(
+        new apiResponse(200,{
+            data:channels,
+            numberofSubscriber:channels.length
+        },"Subscribers fetched successfully"));
+
 })
 
 export {toogleSubscription,getChannelSubscribers,getSubscribedChannel};
