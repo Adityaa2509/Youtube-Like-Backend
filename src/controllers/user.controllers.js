@@ -172,7 +172,6 @@ const loginUser =  asyncHandler(async(req,resp)=>{
 
 })
 
-
 const logoutUser = asyncHandler(async(req,resp)=>{
  
     const userId = req.user._id;
@@ -197,7 +196,6 @@ const logoutUser = asyncHandler(async(req,resp)=>{
            clearCookie("refreshToken",options).
            json(new apiResponse(200,{},"User Loggs out successfully"))
 })
-
 
 const refreshAccessToken = asyncHandler(async(req,resp)=>{
     const incomingRefreshToken = req.cookies?.refreshToken || req.body.refreshToken || req.header("Authorization")?.replace("Bearer ","");
@@ -238,7 +236,6 @@ const refreshAccessToken = asyncHandler(async(req,resp)=>{
     }
 
 })
-
 
 const updateUserPassword = asyncHandler(async(req,resp)=>{
     const userId = req.user._id;
